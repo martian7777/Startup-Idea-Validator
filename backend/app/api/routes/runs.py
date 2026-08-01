@@ -6,7 +6,7 @@ import asyncio
 import json
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel
 from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -59,7 +59,7 @@ async def create_run(
 
 @router.get("", response_model=list[RunSummary])
 async def list_runs(
-    limit: int = 25, session: AsyncSession = Depends(get_session)
+    limit: int = Query(default=25, ge=1, le=100), session: AsyncSession = Depends(get_session)
 ) -> list[RunSummary]:
     result = await session.execute(select(Run).order_by(desc(Run.created_at)).limit(limit))
     return [

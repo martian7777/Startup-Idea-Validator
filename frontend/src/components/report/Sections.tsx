@@ -8,6 +8,7 @@ import type {
   Scenario,
   ValidationStep,
 } from "@/lib/api";
+import { safeExternalUrl } from "@/lib/api";
 import { BulletList, Callout, Card, Empty, Prose, cx } from "@/components/ui";
 
 // --- Competitors ----------------------------------------------------------
@@ -49,9 +50,9 @@ export function CompetitorTable({ competitors }: { competitors: CompetitorSet })
                 className="border-b border-hairline align-top last:border-0"
               >
                 <th scope="row" className="px-4 py-3 text-left font-medium text-ink">
-                  {competitor.source_url ? (
+                  {safeExternalUrl(competitor.source_url) ? (
                     <a
-                      href={competitor.source_url}
+                      href={safeExternalUrl(competitor.source_url)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-accent underline-offset-2 hover:underline"

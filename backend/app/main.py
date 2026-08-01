@@ -7,6 +7,8 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.trustedhost import TrustedHostMiddleware
+from starlette.responses import JSONResponse
 
 from app.api.routes import runs
 from app.config import get_settings
@@ -55,26 +57,34 @@ def create_app() -> FastAPI:
         CORSMiddleware,
         allow_origins=settings.cors_origins,
         allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
+        allow_methods=["GET", "POST", "OPTIONS"],
+        allow_headers=["Authorization", "Content-Type", "Last-Event-ID"],
     )
+    app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.trusted_hosts)
+
+    @app.middleware("http")
+    async def security_boundary(request, call_next):
+        content_length = request.headers.get("content-length")
+        if content_length:
+            try:
+                if int(content_length) > settings.max_request_body_bytes:
+                    return JSONResponse({"detail": "Request body too large"}, status_code=413)
+            except ValueError:
+                return JSONResponse({"detail": "Invalid Content-Length"}, status_code=400)
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Referrer-Policy"] = "no-referrer"
+        response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+        response.headers["Cache-Control"] = "no-store"
+        if settings.environment.lower() == "production":
+            response.headers["Strict-Transport-Security"] = "max-age=63072000; includeSubDomains; preload"
+        return response
     app.include_router(runs.router)
 
-    @app.get("/health")
+    @app.get("/health", include_in_schema=False)
     async def health() -> dict:
-        return {
-            "status": "ok",
-            "grounding_enabled": settings.grounding_available,
-            "models": {
-                "extract": settings.model_extract,
-                "research": settings.model_research,
-                "critic": settings.model_critic,
-            },
-            "search_budget": {
-                "per_agent": settings.max_searches_per_agent,
-                "per_run": settings.max_searches_per_run,
-            },
-        }
+        return {"status": "ok"}
 
     return app
 

@@ -46,13 +46,29 @@ class Settings(BaseSettings):
     database_direct_url: str = ""
 
     # --- App --------------------------------------------------------------
+    environment: str = "development"
     cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:3000"])
     dev_user_id: str = "00000000-0000-0000-0000-000000000001"
+    max_request_body_bytes: int = 16_384
+    trusted_hosts: list[str] = Field(default_factory=lambda: ["localhost", "127.0.0.1"])
 
     @model_validator(mode="after")
     def _default_direct_url(self) -> "Settings":
         if not self.database_direct_url:
             self.database_direct_url = self.database_url
+        return self
+
+    @model_validator(mode="after")
+    def _production_safety(self) -> "Settings":
+        if self.environment.lower() == "production":
+            if not self.database_url:
+                raise ValueError("DATABASE_URL is required in production")
+            if not self.gemini_api_key:
+                raise ValueError("GEMINI_API_KEY is required in production")
+            if any(origin.startswith("http://") for origin in self.cors_origins):
+                raise ValueError("CORS_ORIGINS must contain only HTTPS origins in production")
+            if "*" in self.cors_origins or "*" in self.trusted_hosts:
+                raise ValueError("Wildcard origins/hosts are forbidden in production")
         return self
 
     @property

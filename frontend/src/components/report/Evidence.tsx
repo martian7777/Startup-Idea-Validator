@@ -8,7 +8,7 @@
  * always spelled out.
  */
 
-import type { Claim, EvidenceStrength, ClaimKind } from "@/lib/api";
+import { safeExternalUrl, type Claim, type EvidenceStrength, type ClaimKind } from "@/lib/api";
 import { Empty, cx } from "@/components/ui";
 
 const STRENGTH_LABEL: Record<EvidenceStrength, string> = {
@@ -32,6 +32,7 @@ const KIND_STYLE: Record<ClaimKind, string> = {
 };
 
 const THREE_YEARS_MS = 1000 * 60 * 60 * 24 * 365 * 3;
+const RENDER_EPOCH_MS = Date.now();
 
 /** Strength as filled pips, so it is legible without relying on hue. */
 function StrengthMeter({ strength }: { strength: EvidenceStrength }) {
@@ -57,10 +58,11 @@ function StrengthMeter({ strength }: { strength: EvidenceStrength }) {
 }
 
 export function ClaimCard({ claim }: { claim: Claim }) {
-  const unsourced = !claim.source_url;
+  const sourceUrl = safeExternalUrl(claim.source_url);
+  const unsourced = !sourceUrl;
   const stale =
     claim.published_date &&
-    Date.now() - new Date(claim.published_date).getTime() > THREE_YEARS_MS;
+    RENDER_EPOCH_MS - new Date(claim.published_date).getTime() > THREE_YEARS_MS;
 
   return (
     <li
@@ -84,9 +86,9 @@ export function ClaimCard({ claim }: { claim: Claim }) {
       </div>
 
       <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
-        {claim.source_url ? (
+        {sourceUrl ? (
           <a
-            href={claim.source_url}
+            href={sourceUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="max-w-full truncate text-accent underline-offset-2 hover:underline"
