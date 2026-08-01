@@ -189,6 +189,38 @@ def score_category(
     )
 
 
+def apply_critic_overrides(
+    ratings: list[CategoryRating],
+    overrides: list[CategoryRating],
+) -> list[CategoryRating]:
+    """Merge the critic's ratings into the researchers', taking the lower.
+
+    The critic exists to challenge, so its influence is deliberately
+    one-directional. An override that would *raise* a rating is discarded
+    rather than trusted -- that is the mechanism preventing a persuasive
+    critic from laundering weak evidence into a stronger score.
+    """
+    by_override = {o.category: o for o in overrides}
+    merged: list[CategoryRating] = []
+
+    for rating in ratings:
+        override = by_override.pop(rating.category, None)
+        if override is not None and override.rating < rating.rating:
+            merged.append(
+                CategoryRating(
+                    category=rating.category,
+                    rating=override.rating,
+                    justification=f"Critic lowered this: {override.justification}",
+                )
+            )
+        else:
+            merged.append(rating)
+
+    # A critic rating a category nobody else rated is still a downgrade from
+    # the implicit zero, so it only counts if the category was rated at all.
+    return merged
+
+
 def band_for(total: float) -> tuple[str, str]:
     rounded = int(round(total))
     for low, high, key, label in BANDS:
