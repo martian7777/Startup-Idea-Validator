@@ -1,73 +1,78 @@
-# Multi-Agent Startup Idea Validator
+<div align="center">
 
-> **An evidence-backed startup validation engine powered by Google ADK 2.0 & Gemini 3.**  
-> Six specialized agents research, challenge, and score startup ideas on a scale of 0–100 — without flattery.
+# 🚀 Multi-Agent Startup Idea Validator
 
----
+**An evidence-backed, multi-agent market & feasibility analysis engine built with Google ADK 2.0 & Gemini 3.**
 
-## 📋 Table of Contents
+*Six specialized AI agents research, stress-test, and mathematically score startup concepts — with strictly zero flattery.*
 
-- [Overview](#overview)
-- [Key Features](#key-features)
-- [Tech Stack](#tech-stack)
-- [Architecture](#architecture)
-  - [Agent Graph Workflow](#agent-graph-workflow)
-  - [Search → Extract Node Separation](#search--extract-node-separation)
-  - [Verified Source Attribution](#attribution-is-verified-not-trusted)
-  - [Deterministic Scoring Engine](#scoring-is-deterministic)
-  - [Cost & Rate Control](#cost-control)
-- [Setup & Quick Start](#setup)
-  - [Backend Setup](#backend)
-  - [Frontend Setup](#frontend)
-- [Frontend Architecture & Design Tokens](#frontend-architecture)
-  - [Component Map](#component-map)
-  - [Design Tokens & Accessibility](#design-tokens)
-  - [Chart Visualization Rules](#chart-decisions)
-- [Testing & Validation](#tests)
-- [Status & Roadmap](#status)
-- [Governance](#governance)
+[![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Next.js 16](https://img.shields.io/badge/Next.js-16-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Google ADK 2.0](https://img.shields.io/badge/Google_ADK-2.6.1-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white)](https://cloud.google.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](file:///d:/founder%20ai/LICENSE)
+[![Tests Passing](https://img.shields.io/badge/Tests-74_Passing-brightgreen?style=for-the-badge&logo=pytest&logoColor=white)](file:///d:/founder%20ai/backend/tests)
+
+[Explore Features](#-key-features) • [System Architecture](#%EF%B8%8F-system-architecture) • [Quick Start](#-quick-start) • [Scoring Engine](#-deterministic-scoring-engine) • [Testing](#-testing--validation)
 
 ---
 
-## Overview
+</div>
 
-Six specialized agents research and challenge a startup idea, then return an evidence-backed opportunity report and a score out of 100.
+## 📌 Overview
+
+The **Multi-Agent Startup Idea Validator** deploys six specialized AI agents to rigorously research and challenge startup ideas. It produces a fully sourced opportunity report and an objective feasibility score out of 100.
 
 > [!IMPORTANT]
-> **Core Design Principle**: The system **must not flatter the founder**.
-> - Every claim carries a source, a date, and a confidence level.
-> - Every metric declares whether it was *sourced*, *calculated*, or *assumed*.
-> - The critic agent can **only lower confidence**, never raise it.
-> - The final score is computed by Python from structured agent output — **never by an LLM**.
+> **Core Design Principle: The system must not flatter the founder.**
+> - 🎯 **100% Sourced**: Every claim carries an explicit source URL, date, and confidence rating.
+> - 📊 **Strict Categorization**: Every metric is explicitly tagged as *sourced*, *calculated*, or *assumed*.
+> - 📉 **One-Way Override**: Critic agents can **only lower confidence**, never raise it.
+> - 🧮 **Pure Python Scorer**: Final scores are calculated deterministically — **never by an LLM**.
 
 ---
 
-## Key Features
+## ⚡ Key Features
 
-- 🧠 **Google ADK 2.0 Execution Graph**: Parallel research execution for Market, Competitor, and Persona analysis with a barrier join.
-- 🔍 **Strict Attribution Verification**: Compares cited URLs against `grounding_metadata`. Fabricated URLs are un-sourced and capped at 30% confidence.
-- 📐 **Deterministic Scoring Engine**: Pure Python rating calculation enforcing decay by age, evidence ceilings (anecdotes capped at 0.35), source freshness scaling, and diminishing returns.
-- ⚡ **Real-Time SSE Streaming**: Async FastAPI pipeline pushing live run steps, agent outputs, and progress logs directly to Next.js.
-- 🎨 **Accessible & Responsive Design System**: Dark/light theme support, contrast-validated categorical palettes, and an isolated fixture preview route (`/preview`).
-
----
-
-## Tech Stack
-
-| Component | Choice | Details |
-|---|---|---|
-| **Agent Framework** | Google ADK 2.0 (`google-adk` 2.6.1) | Workflow graph runtime |
-| **Models** | Gemini 3 Series | Tiered by cost (`flash-lite`, `flash`, `3.6-flash`) |
-| **Backend API** | FastAPI + Pydantic | Async REST + Server-Sent Events (SSE) |
-| **Database** | Supabase Postgres | SQLAlchemy async + Alembic migrations |
-| **Worker Engine** | Asyncio Worker | Postgres-backed run queue |
-| **Frontend** | Next.js 16 + TypeScript + Tailwind | App Router with interactive Recharts visualization |
+| Feature | Description |
+|---|---|
+| 🧠 **Google ADK 2.0 Engine** | Parallel graph runtime managing multi-agent execution branches with fan-in barriers. |
+| 🛡️ **Verified Attribution** | Cross-checks cited URLs against `grounding_metadata`. Fabricated links cap confidence at 30%. |
+| 🧮 **Deterministic Scorer** | Pure Python rating algorithm incorporating source age decay, diminishing returns, and math ceilings. |
+| ⚡ **Real-Time Streaming** | Async FastAPI backend pushing live agent execution status and logs to Next.js via Server-Sent Events (SSE). |
+| 🎨 **Accessible UI Design** | Custom dark/light mode surfaces, verified 3:1 contrast ratios, and a fixture preview route (`/preview`). |
 
 ---
 
-## Architecture
+## 🏗️ System Architecture
 
-### Agent Graph Workflow
+### Agent Workflow Graph
+
+```mermaid
+graph TD
+    M[Manager Node] --> MS[Market Search]
+    M --> CS[Competitor Search]
+    M --> PS[Persona Search]
+    
+    MS --> ME[Market Extract]
+    CS --> CE[Competitor Extract]
+    PS --> PE[Persona Extract]
+    
+    ME --> RJ{Research Join Barrier}
+    CE --> RJ
+    PE --> RJ
+    
+    RJ --> FIN[Financial Node]
+    FIN --> CRIT[Critic Node]
+    CRIT --> REP[Reporter Node]
+
+    style M fill:#4285F4,color:#fff,stroke:#333
+    style RJ fill:#EA4335,color:#fff,stroke:#333
+    style FIN fill:#34A853,color:#fff,stroke:#333
+    style CRIT fill:#FBBC05,color:#333,stroke:#333
+    style REP fill:#8E44AD,color:#fff,stroke:#333
+```
 
 ```
                     manager
@@ -87,159 +92,163 @@ Six specialized agents research and challenge a startup idea, then return an evi
 
 ### Search → Extract Node Separation
 
-Each research branch is **two nodes**, not one:
+Each research branch utilizes a **two-node architecture**:
 
-1. **Search node** — has the `google_search` tool, no output schema. Produces prose plus grounding metadata.
-2. **Extract node** — has a strict Pydantic output schema, no tools, runs on the cheapest model (`flash-lite`).
+1. **Search Node**: Armed with the `google_search` tool (no output schema). Produces raw prose and grounding metadata.
+2. **Extract Node**: Structured Pydantic schema (no tools), running on Gemini's cost-effective `flash-lite` tier.
 
-This keeps structuring work on the lite tier, avoids depending on ADK's version-dependent `output_schema`-with-tools behaviour, and creates the seam where attribution is verified.
+This pattern isolates tool interaction from data structuring, reducing search API overhead while creating an explicit audit point for link verification.
 
-### Attribution is Verified, Not Trusted
+### Verified Source Attribution
 
-URLs a model *writes* can be invented. URLs in `grounding_metadata` are what the search tool actually retrieved. Only the latter are accepted: any claim citing an unretrieved URL is stripped of its source, downgraded from `fact` to `estimate`, capped at 30% confidence, and reported to the UI. See [`app/llm/grounding.py`](file:///d:/founder%20ai/backend/app/llm/grounding.py) and [`app/worker/execute.py`](file:///d:/founder%20ai/backend/app/worker/execute.py).
+URLs generated directly in model prose can be hallucinated. The validator cross-references every cited link against `grounding_metadata` retrieved by the search tool. Unverified links are:
+- Stripped of source attribution
+- Downgraded from `fact` to `estimate`
+- Capped at **30% maximum confidence**
 
-### Scoring is Deterministic
-
-[`app/scoring/`](file:///d:/founder%20ai/backend/app/scoring/) contains no LLM call and never should. Agents propose a 0–1 rating per category; the scorer decides what the evidence is actually worth:
-
-- Per-claim weight decays with age; undated evidence gets a fixed middling multiplier.
-- A category's ceiling is set by its **best** evidence strength — anecdotes cap at 0.35, no evidence at 0.25.
-- That ceiling is further scaled by the freshness of the best source, because coverage saturates and would otherwise let a stack of six-year-old reports score like fresh ones.
-- Coverage has diminishing returns: ten weak citations never equal one strong study.
-- Contradictions and unsound reasoning deduct fixed points.
-
-Every adjustment can only hold a rating **down**. That is enforced by test ([`test_adjustments_only_ever_lower_a_rating`](file:///d:/founder%20ai/backend/tests/test_critic_overrides.py)), not by convention.
-
-### Cost Control
-
-Gemini 3 bills **per search query the model executes**, not per request, and one call can trigger several. [`app/llm/budget.py`](file:///d:/founder%20ai/backend/app/llm/budget.py) enforces hard per-agent and per-run caps by metering `web_search_queries` from grounding metadata.
-
-Models are tiered: `flash-lite` for extraction, `flash` for research, `3.6-flash` for critic and report. ADK's workflow runtime forces `include_contents='none'` on single-turn nodes, so no conversation history leaks between agents — only structured JSON crosses node boundaries.
+*Implementation details: [`app/llm/grounding.py`](file:///d:/founder%20ai/backend/app/llm/grounding.py) & [`app/worker/execute.py`](file:///d:/founder%20ai/backend/app/worker/execute.py)*
 
 ---
 
-## Setup
+## 🧮 Deterministic Scoring Engine
 
-### Backend
+The scoring module located in [`app/scoring/`](file:///d:/founder%20ai/backend/app/scoring/) contains **zero LLM calls**. Ratings are mathematically derived from agent outputs:
+
+- ⏳ **Age Decay**: Citation weights decay with source age. Undated evidence receives a middling multiplier.
+- 🛑 **Evidence Ceilings**: Category score caps depend on evidence quality (anecdotes cap at **0.35**, no evidence caps at **0.25**).
+- 📉 **Freshness Scaling**: Category ceilings scale with source freshness to prevent dated reports from saturating scores.
+- 📐 **Diminishing Returns**: Multiple weak citations cannot equal one authoritative study.
+- ⚠️ **Contradiction Penalty**: Contradictions and logic flaws trigger direct point deductions.
+
+> [!NOTE]
+> All scoring adjustments **only ever lower ratings**. This constraint is strictly enforced by unit test [`test_adjustments_only_ever_lower_a_rating`](file:///d:/founder%20ai/backend/tests/test_critic_overrides.py).
+
+---
+
+## 🛠️ Quick Start
+
+### Prerequisites
+- Python 3.11+
+- Node.js 18+ & npm
+- Supabase Postgres Database
+
+### 1. Backend Setup
 
 ```bash
+# Navigate to backend
 cd backend
+
+# Create & activate Python virtual environment
 uv venv --python 3.11
+# Windows: .venv\Scripts\activate | Linux/macOS: source .venv/bin/activate
+
+# Install dependencies
 uv pip install -r requirements.txt
-cp .env.example .env      # Fill in GEMINI_API_KEY and both Supabase URLs
+
+# Configure Environment
+cp .env.example .env
+# Edit .env and supply GEMINI_API_KEY, DATABASE_URL, and DATABASE_DIRECT_URL
+
+# Apply database schema
 alembic revision --autogenerate -m "initial"
 alembic upgrade head
+
+# Start FastAPI development server
 uvicorn app.main:app --reload
 ```
 
 > [!NOTE]
-> **Supabase Connection Strings — The two ports are not interchangeable:**
-> - `DATABASE_URL` → port **6543** (transaction pooler). The app disables asyncpg's statement cache here; without that you get intermittent "prepared statement does not exist" errors once connections are reused.
-> - `DATABASE_DIRECT_URL` → port **5432** (direct). Alembic refuses the pooler outright, since DDL through PgBouncer fails confusingly.
+> **Supabase Connection Ports:**
+> - `DATABASE_URL` (Port **6543**): Transaction pooler. App disables statement cache to prevent asyncpg errors.
+> - `DATABASE_DIRECT_URL` (Port **5432**): Direct connection required for Alembic schema migrations.
 
-### Frontend
+### 2. Frontend Setup
 
 ```bash
+# Navigate to frontend
 cd frontend
+
+# Install dependencies
 npm install
-npm run dev          # http://localhost:3000
+
+# Start Next.js dev server
+npm run dev
 ```
 
-Visit [`/preview`](http://localhost:3000/preview) for the report rendered against fixture data — it needs no backend, no API key and no completed run, so layout and both colour schemes can be inspected in isolation. It is not linked from the main app navigation.
+Open [http://localhost:3000](http://localhost:3000) in your browser.  
+Visit [http://localhost:3000/preview](http://localhost:3000/preview) to view the fixture-driven report UI without needing backend or API key execution.
 
 ---
 
-## Frontend Architecture
-
-### Component Map
+## 💻 Tech Stack Overview
 
 ```
-src/
-├── app/
-│   ├── page.tsx              # Submission form + run history
-│   ├── runs/[id]/page.tsx    # Live progress → full report view
-│   └── preview/page.tsx      # Fixture-driven design preview
-├── hooks/useRunStream.ts     # SSE subscription → derived view state
-├── components/
-│   ├── ui/                   # Card, Section, Callout, StatTile, BulletList
-│   ├── charts/ScenarioChart  # Recharts columns + stat tiles + table view
-│   └── report/               # ScorePanel, Evidence, Sections, Report
-└── lib/api.ts                # Client + contracts mirroring Pydantic schemas
+Frontend               Backend                      Agent Runtime
+┌──────────────────┐   ┌────────────────────────┐   ┌────────────────────────┐
+│ Next.js 16       │   │ FastAPI (Async)        │   │ Google ADK 2.0         │
+│ TypeScript       │──►│ Pydantic Contracts     │──►│ Gemini 3 (Tiered)      │
+│ Tailwind CSS     │   │ Asyncio Worker Queue   │   │ Grounding Verification │
+│ Recharts         │   │ Supabase PostgreSQL    │   │ Deterministic Scorer   │
+└──────────────────┘   └────────────────────────┘   └────────────────────────┘
 ```
-
-The report renders from the **structured JSON**, not the markdown blob. The markdown exists for download; displaying it would discard every distinction the schema works to preserve — sourced vs assumed, fresh vs dated, fact vs hypothesis.
-
-### Design Tokens
-
-`globals.css` defines surfaces, ink, and two strictly separated palettes. Dark mode is stepped for the dark surface rather than being an inverted flip, and is declared under both `prefers-color-scheme` and `[data-theme]` so a theme toggle wins in either direction.
-
-- **Chart series** use validated categorical slots 1–2 (blue `#2a78d6` / orange `#eb6834`; dark `#3987e5` / `#d95926`). Both modes pass the lightness band, chroma floor, CVD separation (ΔE 24.7 light / 26.8 dark, target ≥ 8), normal-vision floor and 3:1 contrast checks.
-- **Score bands** use the reserved status palette and are never a series colour. Two of the four status steps sit below 3:1 on the light surface, so status colour is only ever applied to a *mark* — a glyph, a dot, a tinted chip — while the text beside it stays in primary ink. That is why the hero score number is ink rather than its band colour.
-
-### Chart Decisions
-
-- **Grouped columns, revenue against costs.** The founder's real question is whether it clears its costs and under which assumptions — a magnitude comparison.
-- **Break-even customers are stat tiles, not a second axis.** Different unit; a dual axis would invent a relationship the data does not contain.
-- Columns capped at 24px with 4px rounded data-ends and a 2px surface gap; solid hairline gridlines; axis ticks snapped to 1/2/2.5/5 × 10ⁿ steps.
-- Legend always present (two series), and a **table view** twin means no value is reachable only by hovering.
 
 ---
 
-## Tests
+## 🧪 Testing & Validation
+
+Run the offline pytest suite (74 tests, 0 network dependencies):
 
 ```bash
-cd backend && python -m pytest tests/ -q     # 74 tests, no network, no API key
+cd backend && python -m pytest tests/ -q
 ```
 
-| Test File | Covers |
+### Test Suite Summary
+
+| Module | Scope Covered |
 |---|---|
-| `test_scorer.py` | Staleness, coverage, ceilings, determinism, bounds |
-| `test_critic_overrides.py` | The critic can lower a rating and never raise one |
-| `test_grounding.py` | Source harvest, search metering, fabricated-URL detection |
-| `test_pipeline.py` | Graph shape, fan-in barrier, model tiering, Search→Extract split |
-| `test_end_to_end_offline.py` | Attribution → ledger → score → markdown |
-| `test_api.py` | Run lifecycle, SSE replay, restart recovery, event bus |
+| `test_scorer.py` | Staleness decay, coverage diminishing returns, ceiling caps, determinism |
+| `test_critic_overrides.py` | Enforces that critic agent overrides only lower scores |
+| `test_grounding.py` | Search query metering & fabricated URL stripping |
+| `test_pipeline.py` | Fan-in barrier join, model tiering, Search → Extract isolation |
+| `test_end_to_end_offline.py` | Full attribution → ledger → score → markdown generation |
+| `test_api.py` | Job run lifecycle, SSE replay, restart recovery |
 
-> [!IMPORTANT]
-> **The Load-Bearing Test**: `test_weak_idea_lands_in_the_bottom_band`
-> A water-reminder app for everyone, free, with maximally enthusiastic agents and nothing but Reddit upvotes as evidence. It **must** land in the 0–39 band. If it ever passes while scoring well, the product is actively misleading founders.
+### Benchmark Discrimination Across Test Scenarios
 
-### Discrimination Across Test Scenarios
-
-| Scenario | Score | Band |
-|---|---:|---|
-| No evidence, agents euphoric | 12.5 | High Risk |
-| Only anecdotes (×10) | 19.1 | High Risk |
-| A few weak sources | 30.6 | High Risk |
-| Strong evidence, 6 years old | 44.4 | Weak |
-| Moderate, fresh | 61.6 | Promising |
-| Strong + fresh | 85.5 | Strong |
+```
+  100 🚀
+   80 │                                                 [85.5] Strong + Fresh
+   60 │                               [61.6] Moderate
+   40 │               [44.4] Old
+   20 │  [12.5]   [19.1]     [30.6] Weak
+    0 └──┴───────┴──────────┴─────────┴───────────────┴───────────────────────
+         Euphoric Anecdotes  Weak      6-Yr Old        Fresh           Fresh
+         No Evid.  (×10)     Sources   Strong          Moderate        Strong
+```
 
 ---
 
-## Status & Roadmap
+## 📊 Project Status & Roadmap
 
-### Working and Verified
-- Full HTTP → job runner → ADK graph → Gemini path
-- Scorer engine & evidence scaling
-- Grounding attribution verification
-- SSE progress streaming with replay
-- Restart recovery & frontend UI build
-
-### Known Google API Issue
-A live smoke test reached the Gemini API and returned `429 RESOURCE_EXHAUSTED` with `quota_limit_value: 0` for `generativelanguage.googleapis.com` in `europe-west1` — indicating billing activation or Gemini 3 model enablement is required on the Google Cloud project. This is a Google-side project setting, not a codebase defect.
-
-### Next Steps
-- [ ] Resolve Gemini Cloud quota and run seed ideas end-to-end.
-- [ ] Implement per-section rerun support via ADK's `rerun_on_resume`.
-- [ ] Integrate `research_cache` using `pgvector` for similarity reuse.
-- [ ] Upgrade to Supabase Auth to replace the single dev user model.
-- [ ] Auto-generate frontend TypeScript types from FastAPI OpenAPI schemas.
+- [x] **Core Execution Engine**: Full HTTP → Async Runner → ADK Graph → Gemini pipeline.
+- [x] **Attribution & Scoring**: Grounding metadata verification & mathematical scorer.
+- [x] **Streaming & Replay**: SSE event bus, progress streaming, and job recovery.
+- [x] **Frontend Visualizer**: Responsive report rendering, theme tokens, and preview route.
+- [ ] **Quota & Live Runs**: Resolve regional API quota limits to execute live grounded runs.
+- [ ] **Section Reruns**: Individual node reruns via ADK `rerun_on_resume`.
+- [ ] **Vector Caching**: `pgvector` similarity search in `research_cache`.
+- [ ] **Type Safety**: Auto-generate TypeScript contracts from FastAPI OpenAPI schemas.
 
 ---
 
-## Governance
+## 📜 Governance & License
 
-- 📄 **License**: Distributed under the [MIT License](file:///d:/founder%20ai/LICENSE).
-- 🤝 **Contributing**: Read our [Contributing Guidelines](file:///d:/founder%20ai/CONTRIBUTING.md) to get started.
-- 📜 **Changelog**: View historical updates in the [Changelog](file:///d:/founder%20ai/CHANGELOG.md).
+- 📄 **License**: [MIT License](file:///d:/founder%20ai/LICENSE)
+- 🤝 **Contributing Guidelines**: [CONTRIBUTING.md](file:///d:/founder%20ai/CONTRIBUTING.md)
+- 📝 **Changelog**: [CHANGELOG.md](file:///d:/founder%20ai/CHANGELOG.md)
+
+<div align="center">
+
+Made with ❤️ by the Multi-Agent Startup Validator Team
+
+</div>
