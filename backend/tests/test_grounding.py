@@ -9,7 +9,6 @@ from __future__ import annotations
 from types import SimpleNamespace
 
 import pytest
-
 from app.llm.budget import RunBudget, SearchBudgetExceeded
 from app.llm.grounding import (
     count_searches,

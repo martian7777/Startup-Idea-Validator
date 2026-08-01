@@ -98,8 +98,10 @@ def render_markdown(
 
     if report is None:
         lines += [
-            "_The report agent did not complete. The score and evidence below "
-            "reflect what was gathered before the run stopped._",
+            (
+                "_The report agent did not complete. The score and evidence below "
+                "reflect what was gathered before the run stopped._"
+            ),
             "",
         ]
         lines += [render_score(score), ""]
@@ -222,8 +224,10 @@ def render_markdown(
         if unsourced:
             lines += [
                 "",
-                f"> {unsourced} of {len(ledger.claims)} claims have no verifiable "
-                "source. Weight them accordingly.",
+                (
+                    f"> {unsourced} of {len(ledger.claims)} claims have no verifiable "
+                    "source. Weight them accordingly."
+                ),
             ]
     else:
         lines.append(

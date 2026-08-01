@@ -19,7 +19,7 @@ from typing import Any, Protocol
 from uuid import UUID
 
 from sqlalchemy import select, update
-from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.db.models import Run, RunEvent, RunStatus
 

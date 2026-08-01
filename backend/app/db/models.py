@@ -67,10 +67,10 @@ class Run(Base):
     started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
-    events: Mapped[list["RunEvent"]] = relationship(
+    events: Mapped[list[RunEvent]] = relationship(
         back_populates="run", cascade="all, delete-orphan", order_by="RunEvent.seq"
     )
-    report: Mapped["Report | None"] = relationship(
+    report: Mapped[Report | None] = relationship(
         back_populates="run", cascade="all, delete-orphan", uselist=False
     )
 
@@ -92,7 +92,7 @@ class RunEvent(Base):
     payload: Mapped[dict | None] = mapped_column(JsonB, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
 
-    run: Mapped["Run"] = relationship(back_populates="events")
+    run: Mapped[Run] = relationship(back_populates="events")
 
 
 class Evidence(Base):
@@ -123,7 +123,7 @@ class Report(Base):
     markdown: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
 
-    run: Mapped["Run"] = relationship(back_populates="report")
+    run: Mapped[Run] = relationship(back_populates="report")
 
 
 class ResearchCache(Base):

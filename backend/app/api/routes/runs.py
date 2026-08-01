@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
@@ -20,6 +21,8 @@ from app.schemas.contracts import IdeaSubmission
 router = APIRouter(prefix="/api/runs", tags=["runs"])
 
 TERMINAL = {RunStatus.COMPLETED.value, RunStatus.FAILED.value, RunStatus.INTERRUPTED.value}
+
+SessionDep = Annotated[AsyncSession, Depends(get_session)]
 
 
 class RunCreated(BaseModel):
@@ -41,7 +44,7 @@ class RunSummary(BaseModel):
 async def create_run(
     submission: IdeaSubmission,
     request: Request,
-    session: AsyncSession = Depends(get_session),
+    session: SessionDep,
 ) -> RunCreated:
     settings = get_settings()
     run = Run(
@@ -59,7 +62,7 @@ async def create_run(
 
 @router.get("", response_model=list[RunSummary])
 async def list_runs(
-    limit: int = Query(default=25, ge=1, le=100), session: AsyncSession = Depends(get_session)
+    session: SessionDep, limit: Annotated[int, Query(ge=1, le=100)] = 25
 ) -> list[RunSummary]:
     result = await session.execute(select(Run).order_by(desc(Run.created_at)).limit(limit))
     return [
@@ -77,7 +80,7 @@ async def list_runs(
 
 
 @router.get("/{run_id}")
-async def get_run(run_id: UUID, session: AsyncSession = Depends(get_session)) -> dict:
+async def get_run(run_id: UUID, session: SessionDep) -> dict:
     run = await session.get(Run, run_id)
     if run is None:
         raise HTTPException(404, "Run not found")
@@ -94,7 +97,7 @@ async def get_run(run_id: UUID, session: AsyncSession = Depends(get_session)) ->
 
 
 @router.get("/{run_id}/report")
-async def get_report(run_id: UUID, session: AsyncSession = Depends(get_session)) -> dict:
+async def get_report(run_id: UUID, session: SessionDep) -> dict:
     result = await session.execute(select(Report).where(Report.run_id == run_id))
     report = result.scalar_one_or_none()
     if report is None:

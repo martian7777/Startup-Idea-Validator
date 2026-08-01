@@ -13,14 +13,12 @@ import uuid
 
 import pytest
 import pytest_asyncio
-from httpx import ASGITransport, AsyncClient
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
-
 from app.api.routes import runs as runs_route
-from app.config import get_settings
 from app.db.models import Base, Run, RunStatus
 from app.db.session import get_session
 from app.worker.runner import AsyncioJobRunner, EventBus, reap_interrupted_runs
+from httpx import ASGITransport, AsyncClient
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 SUBMISSION = {
     "idea": "A tool that tracks differing university application requirements",
@@ -175,9 +173,8 @@ async def test_stream_replays_the_log_after_the_run_finished(client_factory):
 
 @pytest.mark.asyncio
 async def test_events_are_sequenced_without_gaps(client_factory, sessionmaker):
-    from sqlalchemy import select
-
     from app.db.models import RunEvent
+    from sqlalchemy import select
 
     async with client_factory(happy_executor) as client:
         run_id = (await client.post("/api/runs", json=SUBMISSION)).json()["id"]

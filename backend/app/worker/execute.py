@@ -19,7 +19,7 @@ from uuid import UUID
 from google.adk.runners import InMemoryRunner
 from google.genai import types
 from sqlalchemy import select, update
-from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.agents.pipeline import PROGRESS_STAGES, build_pipeline
 from app.config import Settings

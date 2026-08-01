@@ -13,8 +13,9 @@ grounded call without agents having to cooperate:
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Callable
+from typing import Any
 
 from app.llm.budget import RunBudget
 
@@ -84,7 +85,7 @@ def make_grounding_callback(
             )
 
         if metadata is None:
-            return None
+            return
 
         sources = extract_sources(metadata)
         if sources:
@@ -95,7 +96,6 @@ def make_grounding_callback(
         # Charged last: raising here must not lose the sources already
         # harvested from this response.
         budget.charge_searches(agent_name, count_searches(metadata))
-        return None
 
     return _after_model
 

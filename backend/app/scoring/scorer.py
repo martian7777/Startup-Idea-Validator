@@ -12,7 +12,7 @@ only hold a rating down, never lift it.
 
 from __future__ import annotations
 
-from typing import Iterable
+from collections.abc import Iterable
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -222,7 +222,7 @@ def apply_critic_overrides(
 
 
 def band_for(total: float) -> tuple[str, str]:
-    rounded = int(round(total))
+    rounded = round(total)
     for low, high, key, label in BANDS:
         if low <= rounded <= high:
             return key, label

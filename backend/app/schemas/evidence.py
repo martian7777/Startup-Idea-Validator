@@ -76,7 +76,7 @@ class Claim(BaseModel):
     supports: list[ScoreCategory] = Field(default_factory=list)
 
     @model_validator(mode="after")
-    def _enforce_attribution(self) -> "Claim":
+    def _enforce_attribution(self) -> Claim:
         # A fact is a statement about the world; it must be checkable.
         if self.kind is ClaimKind.FACT and not self.source_url:
             raise ValueError(
@@ -85,12 +85,13 @@ class Claim(BaseModel):
             )
         # Strength is a claim about the evidence, not about the assertion.
         # Undated evidence cannot be called strong -- staleness is unknowable.
-        if self.evidence_strength is EvidenceStrength.STRONG:
-            if not self.source_url or not self.published_date:
-                raise ValueError(
-                    f"Claim marked 'strong' needs both source_url and "
-                    f"published_date: {self.text[:80]!r}"
-                )
+        if self.evidence_strength is EvidenceStrength.STRONG and (
+            not self.source_url or not self.published_date
+        ):
+            raise ValueError(
+                f"Claim marked 'strong' needs both source_url and "
+                f"published_date: {self.text[:80]!r}"
+            )
         if self.kind is ClaimKind.ASSUMPTION and self.source_url:
             raise ValueError(
                 "An assumption cannot carry a source_url -- if it has a source, "
@@ -126,7 +127,7 @@ class Number(BaseModel):
     rationale: str | None = None
 
     @model_validator(mode="after")
-    def _enforce_provenance(self) -> "Number":
+    def _enforce_provenance(self) -> Number:
         if self.provenance is Provenance.SOURCED and self.source_claim_id is None:
             raise ValueError(
                 f"Number {self.label!r} claims to be 'sourced' but cites no claim."
@@ -165,7 +166,7 @@ class EvidenceLedger(BaseModel):
                     return
         self.claims.append(claim)
 
-    def merge(self, other: "EvidenceLedger") -> None:
+    def merge(self, other: EvidenceLedger) -> None:
         for claim in other.claims:
             self.add(claim)
 

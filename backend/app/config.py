@@ -53,13 +53,13 @@ class Settings(BaseSettings):
     trusted_hosts: list[str] = Field(default_factory=lambda: ["localhost", "127.0.0.1"])
 
     @model_validator(mode="after")
-    def _default_direct_url(self) -> "Settings":
+    def _default_direct_url(self) -> Settings:
         if not self.database_direct_url:
             self.database_direct_url = self.database_url
         return self
 
     @model_validator(mode="after")
-    def _production_safety(self) -> "Settings":
+    def _production_safety(self) -> Settings:
         if self.environment.lower() == "production":
             if not self.database_url:
                 raise ValueError("DATABASE_URL is required in production")
