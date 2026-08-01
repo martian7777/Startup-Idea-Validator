@@ -22,7 +22,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.12",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^7"
   },
   "//": "overrides: next@16.2.12 (currently `latest`) pins postcss to an exact 8.4.31 and sharp to ^0.34.5, both under high-severity advisories. No stable next release fixes this yet -- even 16.3.0-preview.10 pins postcss 8.5.10, still inside the vulnerable <=8.5.17 range. Remove these once a stable next ships patched pins.",
   "overrides": {
