@@ -8,7 +8,7 @@ product premise.
 
 from __future__ import annotations
 
-from datetime import date, timedelta
+from datetime import datetime, timedelta, timezone
 
 from app.llm.grounding import SourceRef
 from app.reporting.markdown import render_markdown, render_number
@@ -42,7 +42,7 @@ def sourced_claim(text: str, url: str = REAL_URL, days: int = 60) -> Claim:
         confidence=0.9,
         source_url=url,
         source_title="Industry Study 2026",
-        published_date=date.today() - timedelta(days=days),
+        published_date=datetime.now(timezone.utc).date() - timedelta(days=days),
         supports=[C.PROBLEM_SEVERITY, C.DEMAND_EVIDENCE, C.MARKET_ATTRACTIVENESS],
     )
 

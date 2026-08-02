@@ -7,7 +7,7 @@ that weak evidence still drags the result down.
 
 from __future__ import annotations
 
-from datetime import date, timedelta
+from datetime import datetime, timedelta, timezone
 
 import pytest
 from app.schemas.evidence import (
@@ -43,7 +43,7 @@ def claim(
         confidence=confidence,
         source_url="https://example.com/report",
         source_title="Example Report",
-        published_date=date.today() - timedelta(days=age_days),
+        published_date=datetime.now(timezone.utc).date() - timedelta(days=age_days),
         supports=supports or ALL_CATEGORIES,
     )
 
